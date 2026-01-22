@@ -2,7 +2,10 @@ package com.innowise.task.service.impl;
 
 import com.innowise.task.dto.PaymentCardDTO;
 import com.innowise.task.entity.PaymentCard;
+import com.innowise.task.exception.BusinessRuleException;
+import com.innowise.task.exception.NotFoundException;
 import com.innowise.task.exception.ServiceException;
+import com.innowise.task.exception.ValidationException;
 import com.innowise.task.mapper.PaymentCardMapper;
 import com.innowise.task.repository.PaymentCardRepository;
 import com.innowise.task.service.PaymentCardService;
@@ -31,18 +34,18 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     @Transactional
     @Override
-    public PaymentCardDTO create(PaymentCardDTO dto) throws ServiceException {
+    public PaymentCardDTO create(PaymentCardDTO dto) {
         if (dto == null) {
-            throw new ServiceException(CARD_DTO_MUST_NOT_BE_NULL);
+            throw new ValidationException(CARD_DTO_MUST_NOT_BE_NULL);
         }
 
         if (dto.getUserId() == null) {
-            throw new ServiceException(USER_ID_MUST_NOT_BE_NULL);
+            throw new ValidationException(USER_ID_MUST_NOT_BE_NULL);
         }
 
         List<PaymentCard> existingCards = cardRepository.findAllByUserId(dto.getUserId());
         if (existingCards.size() >= 5) {
-            throw new ServiceException(USER_ID_MUST_NOT_HAVE_MORE_THAN_FIVE_CARDS);
+            throw new BusinessRuleException(USER_ID_MUST_NOT_HAVE_MORE_THAN_FIVE_CARDS);
         }
 
         PaymentCard card = PaymentCardMapper.INSTANCE.toEntity(dto);
@@ -52,14 +55,14 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     }
 
     @Override
-    public PaymentCardDTO getById(Long id) throws ServiceException {
+    public PaymentCardDTO getById(Long id) {
         if (id == null) {
-            throw new ServiceException(CARD_ID_MUST_NOT_BE_NULL);
+            throw new ValidationException(CARD_ID_MUST_NOT_BE_NULL);
         }
 
         return cardRepository.findById(id)
                 .map(PaymentCardMapper.INSTANCE::toDTO)
-                .orElseThrow(() -> new ServiceException(CARD_NOT_FOUND + id));
+                .orElseThrow(() -> new NotFoundException(CARD_NOT_FOUND + id));
     }
 
     @Override
@@ -74,36 +77,35 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     @Transactional
     @Override
-    public void setActiveStatus(Long id, boolean active) throws ServiceException {
+    public void setActiveStatus(Long id, boolean active) {
         if (id == null) {
-            throw new ServiceException(CARD_ID_MUST_NOT_BE_NULL);
+            throw new ValidationException(CARD_ID_MUST_NOT_BE_NULL);
         }
 
         int updated = cardRepository.setActiveStatus(id, active);
         if (updated == 0) {
-            throw new ServiceException(CARD_NOT_UPDATED + id);
+            throw new NotFoundException(CARD_NOT_UPDATED + id);
         }
     }
 
     @Transactional
     @Override
-    public void delete(PaymentCardDTO dto) throws ServiceException {
-        if (dto == null || dto.getId() == null) {
-            throw new ServiceException(CARD_ID_MUST_NOT_BE_NULL);
+    public void delete(Long id) {
+        if (id == null) {
+            throw new ValidationException(CARD_ID_MUST_NOT_BE_NULL);
         }
 
-        boolean exists = cardRepository.existsById(dto.getId());
-        if (!exists) {
-            throw new ServiceException(CARD_NOT_FOUND + dto.getId());
+        if (!cardRepository.existsById(id)) {
+            throw new NotFoundException(CARD_NOT_FOUND + id);
         }
 
-        cardRepository.deleteById(dto.getId());
+        cardRepository.deleteById(id);
     }
 
     @Override
-    public List<PaymentCardDTO> getAllByUserId(Long userId) throws ServiceException {
+    public List<PaymentCardDTO> getAllByUserId(Long userId) {
         if (userId == null) {
-            throw new ServiceException(USER_ID_MUST_NOT_BE_NULL);
+            throw new ValidationException(USER_ID_MUST_NOT_BE_NULL);
         }
 
         return cardRepository.findAllByUserId(userId)
@@ -114,17 +116,17 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
     @Transactional
     @Override
-    public PaymentCardDTO update(Long id, PaymentCardDTO dto) throws ServiceException {
+    public PaymentCardDTO update(Long id, PaymentCardDTO dto) {
         if (id == null) {
-            throw new ServiceException(CARD_ID_MUST_NOT_BE_NULL);
+            throw new ValidationException(CARD_ID_MUST_NOT_BE_NULL);
         }
         if (dto == null) {
-            throw new ServiceException(CARD_DTO_MUST_NOT_BE_NULL);
+            throw new ValidationException(CARD_DTO_MUST_NOT_BE_NULL);
         }
 
         int updated = cardRepository.updateCardById(id, dto.getNumber(), dto.getHolder());
         if (updated == 0) {
-            throw new ServiceException(CARD_NOT_UPDATED + id);
+            throw new NotFoundException(CARD_NOT_UPDATED + id);
         }
 
         return getById(id);

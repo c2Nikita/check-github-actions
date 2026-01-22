@@ -7,9 +7,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface BaseService <T> {
 
-    T create(T dto) throws ServiceException;
-    T getById(Long id) throws ServiceException;
-    Page<T> findAll(Specification<?> specification, Pageable pageable) throws ServiceException;
-    void setActiveStatus(Long id, boolean active) throws ServiceException;
-    void delete(T dto) throws ServiceException;
+    T create(T dto);
+    T getById(Long id);
+    Page<T> findAll(Specification<?> specification, Pageable pageable);
+    void setActiveStatus(Long id, boolean active);
+    void delete(Long id);
 }

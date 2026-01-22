@@ -2,7 +2,7 @@ package com.innowise.task.exception;
 
 import org.apache.logging.log4j.message.Message;
 
-public class ServiceException extends Exception {
+public abstract class ServiceException extends RuntimeException {
     public ServiceException(){
         super();
     }

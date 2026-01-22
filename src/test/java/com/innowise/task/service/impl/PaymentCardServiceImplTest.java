@@ -107,7 +107,7 @@ class PaymentCardServiceImplTest {
         when(repository.existsById(1L)).thenReturn(true);
         doNothing().when(repository).deleteById(1L);
 
-        service.delete(dto);
+        service.delete(dto.getId());
 
         verify(repository).deleteById(1L);
     }
