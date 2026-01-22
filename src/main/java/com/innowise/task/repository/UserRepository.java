@@ -22,14 +22,12 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     Page<User> findAll(Specification<User> specification, Pageable pageable);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query("UPDATE User u SET u.name = :name, u.surname = :surname WHERE u.id = :id")
     int updateNameAndSurnameById(@Param("id") Long id,
                                   @Param("name") String name,
                                   @Param("surname") String surname);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query(value = "UPDATE users SET active = :active WHERE id = :id", nativeQuery = true)
     int setActiveStatus(@Param("id") Long id, @Param("active") boolean active);
 
