@@ -7,6 +7,6 @@ import com.innowise.task.exception.ServiceException;
 
 public interface UserService extends BaseService<UserDTO>{
 
-    UserDTO updateNameAndSurname(Long id, String name, String surname) throws ServiceException;
+    UserDTO updateNameAndSurname(Long id, String name, String surname);
 
 }

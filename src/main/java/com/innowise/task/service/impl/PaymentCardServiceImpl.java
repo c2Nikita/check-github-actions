@@ -2,12 +2,14 @@ package com.innowise.task.service.impl;
 
 import com.innowise.task.dto.PaymentCardDTO;
 import com.innowise.task.entity.PaymentCard;
+import com.innowise.task.entity.User;
 import com.innowise.task.exception.BusinessRuleException;
 import com.innowise.task.exception.NotFoundException;
 import com.innowise.task.exception.ServiceException;
 import com.innowise.task.exception.ValidationException;
 import com.innowise.task.mapper.PaymentCardMapper;
 import com.innowise.task.repository.PaymentCardRepository;
+import com.innowise.task.repository.UserRepository;
 import com.innowise.task.service.PaymentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,8 +31,14 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     public static final String USER_ID_MUST_NOT_BE_NULL = "User id must not be null";
     public static final String USER_ID_MUST_NOT_HAVE_MORE_THAN_FIVE_CARDS = "User cannot have more than 5 cards";
 
+    public static final String USER_NOT_FOUND = "User not found with id ";
+
     @Autowired
     private PaymentCardRepository cardRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Transactional
     @Override
@@ -43,12 +51,16 @@ public class PaymentCardServiceImpl implements PaymentCardService {
             throw new ValidationException(USER_ID_MUST_NOT_BE_NULL);
         }
 
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND + dto.getUserId()));
+
         List<PaymentCard> existingCards = cardRepository.findAllByUserId(dto.getUserId());
         if (existingCards.size() >= 5) {
             throw new BusinessRuleException(USER_ID_MUST_NOT_HAVE_MORE_THAN_FIVE_CARDS);
         }
 
         PaymentCard card = PaymentCardMapper.INSTANCE.toEntity(dto);
+        card.setUser(user);
         PaymentCard saved = cardRepository.save(card);
 
         return PaymentCardMapper.INSTANCE.toDTO(saved);

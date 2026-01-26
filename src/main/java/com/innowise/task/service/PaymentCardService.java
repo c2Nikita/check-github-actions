@@ -6,8 +6,8 @@ import com.innowise.task.exception.ServiceException;
 import java.util.List;
 
 public interface PaymentCardService extends BaseService<PaymentCardDTO>{
-    List<PaymentCardDTO> getAllByUserId(Long userId) throws ServiceException;
+    List<PaymentCardDTO> getAllByUserId(Long userId);
 
-    PaymentCardDTO update(Long id, PaymentCardDTO dto) throws ServiceException;
+    PaymentCardDTO update(Long id, PaymentCardDTO dto);
 
 }
