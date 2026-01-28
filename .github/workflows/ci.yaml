@@ -59,12 +59,15 @@ jobs:
           distribution: temurin
           java-version: 20
 
-      - name: SonarQube Scan
+      - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          projectKey: "innowise-my-projcets_check-pipeline"
-          organization: "Innowise"
-          token: ${{ secrets.SONAR_TOKEN }}
+          projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=innowise-my-projcets_check-pipeline
+            -Dsonar.organization=innowise
 
   docker:
     name: Build Docker Image
