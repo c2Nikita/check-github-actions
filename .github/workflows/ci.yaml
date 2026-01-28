@@ -56,7 +56,7 @@ jobs:
       - name: SonarQube Scan
         uses: sonarsource/sonarcloud-github-action@v2
         with:
-          projectKey: "innowise-my-projcets_user-service"
+          projectKey: "innowise-my-projcets_check-pipeline"
           organization: "Innowise"
           token: ${{ secrets.SONAR_TOKEN }}
 
